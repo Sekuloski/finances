@@ -2,19 +2,26 @@
 
 {% block content %}
 
-{% for payment in payments %}
-<div class="col" style="text-align: left">
-    {{ payment.name }}
-    <br> 
-    {{ payment.date }}
-</div>
-{% if payment.amount > 0 %}
-    <div class="col text-success" style="text-align: right">{{ payment.amount }} </div>
-{% else %}
-    <div class="col text-danger" style="text-align: right">{{ payment.amount }} </div>
-{% endif %}
 
+{% for payment in payments %}
+<div class="row">
+    <div class="col align-self-center" style="text-align: left">
+        {{ payment.name }}
+        <br> 
+        {{ payment.date }}
+    </div>
+        {% if payment.amount > 0 %}
+            <div class="col text-success align-self-center" style="text-align: right"> 
+                {{ payment.amount }} 
+            </div>
+        {% else %}
+            <div class="col text-danger align-self-center" style="text-align: right">
+                {{ payment.amount }} 
+            </div>
+        {% endif %}
+</div>
 <hr>
 {% endfor %}
+
 
 {% endblock content %}

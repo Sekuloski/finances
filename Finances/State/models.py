@@ -7,16 +7,15 @@ class CurrentState(models.Model):
     amountInCash = models.IntegerField(default=0)
     currentAmount = models.IntegerField(default=0, editable=False)
     salary = models.IntegerField(default=29500)
+    totalSubscriptions = models.IntegerField(default=0)
 
     def makePayment(self, amount, bank):
         if(bank):
-            if amount < self.amountInBank:
-                self.amountInBank -= amount
-                self.updateAmount()
+            self.amountInBank -= amount
+            self.updateAmount()
         else:
-            if amount < self.amountInCash:
-                self.amountInCash -= amount
-                self.updateAmount()
+            self.amountInCash -= amount
+            self.updateAmount()
 
     def addFunds(self, amount, bank):
         if(bank):
@@ -30,13 +29,29 @@ class CurrentState(models.Model):
         self.currentAmount = self.amountInBank + self.amountInCash
         self.save()
 
+    def updateSubscriptions(self):
+        self.totalSubscriptions = 0
+        for payment in Subscription.objects.all():
+            self.totalSubscriptions += payment.amount
+        self.save()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.currentAmount = self.amountInBank + self.amountInCash
+        self.updateSubscriptions()
         self.save()
 
     def __str__(self):
         return 'Current State'
+
+
+class Subscription(models.Model):
+    amount = models.IntegerField()
+    name = models.CharField(max_length=255)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Payment(models.Model):

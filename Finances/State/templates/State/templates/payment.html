@@ -2,10 +2,10 @@
 
 {% block content %}
 <p style="text-align: center; font-size: 4rem"> Current Amount: {{ state }}</p>
-<form method="post" action="/"> {% csrf_token %}
+<form method="post" action="/pay"> {% csrf_token %}
     <div class="form-group" style="margin: 0 auto;">
 
-        <label class="mb-3 d-flex justify-content-center" for="payment">Payment</label>
+        <label class="mb-3 d-flex justify-content-center" for="payment">Amount</label>
         <div class="d-flex justify-content-center">
             <input class="input-group-text bg-dark text-white" type="number" name="payment" id="payment" style="width: 100px; text-align: left;" required/>
         </div>
