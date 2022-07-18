@@ -11,7 +11,7 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install python3-pip
-            sudo pip3 install awswebcli --upgrade
+            sudo pip3 install awscli --upgrade
       - run: aws s3 sync ./Finances s3://circleci-test-finances
 
 workflows:
