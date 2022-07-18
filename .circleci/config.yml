@@ -12,6 +12,12 @@ jobs:
             sudo apt-get update
             sudo apt-get install python3-pip
             sudo pip3 install awscli --upgrade
+      - run: |
+          aws configure
+          $AWS_ACCESS_KEY_ID
+          $AWS_SECRET_ACCESS_KEY
+          eu-south-1
+          json
       - run: aws s3 sync --region eu-south-1 ./Finances s3://circleci-test-finances
 
 workflows:
