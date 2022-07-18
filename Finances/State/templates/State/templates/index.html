@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{{ state.currentAmount }}
+<p style="text-align: center">{{ state }}</p>
+<a class="btn btn-primary" type="submit" href="/payment">Make Payment</a>
+<br>
+<br>
+{% for month, amount in months.items %}
+<div class="col" style="text-align: left"> {{ month }} </div>
+<div class="col" style="text-align: right"> {{ amount }} </div>
+{% endfor %}
 {% endblock content %}
