@@ -14,6 +14,7 @@ jobs:
             sudo pip3 install awscli --upgrade
       - run: |
           aws configure
+      - run: |
           echo $AWS_ACCESS_KEY_ID
           echo $AWS_SECRET_ACCESS_KEY
           echo eu-south-1
