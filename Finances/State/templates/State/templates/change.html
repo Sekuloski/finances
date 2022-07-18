@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p style="text-align: center; font-size: 4rem"> Current Amount: {{ state.currentAmount }}</p>
+<form method="post" action="/change"> {% csrf_token %}
+    <div class="form-group" style="margin: 0 auto;">
+
+        <label class="mb-3 d-flex justify-content-center" for="bank">Bank</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="number" name="bank" id="bank" style="width: 100px; text-align: left;" value="{{ state.amountInBank }}" required/>
+        </div>
+        <br>
+
+        <label class="mb-3 d-flex justify-content-center" for="cash">Cash</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="number" name="cash" id="cash" style="width: 100px; text-align: left;" value="{{ state.amountInCash }}" required/>
+        </div>
+        <br>
+
+        <div class="mt-3 d-flex justify-content-center">
+            <input class="btn btn-primary" type="submit" value="Apply">
+        </div>
+    </div>
+</form>
+{% endblock content %}

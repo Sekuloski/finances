@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p style="text-align: center; font-size: 4rem"> Current Amount: {{ state }}</p>
+<form method="post" action="/pay"> {% csrf_token %}
+    <div class="form-group" style="margin: 0 auto;">
+
+        <label class="mb-3 d-flex justify-content-center" for="payment">Amount</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="number" name="payment" id="payment" style="width: 100px; text-align: left;" required/>
+        </div>
+        <br>
+
+        <label class="mb-3 d-flex justify-content-center" for="name">Name</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="text" name="name" id="name" style="width: 200px; text-align: left;" required/>
+        </div>
+        <br>
+        
+        <input class="form-check-input" type="checkbox" name="bank" id="bank" checked/>
+        <label class="form-check-label" for="bank">
+            Bank
+        </label>
+        <br>
+        <br>
+
+        <div class="form-check d-flex justify-content-center">
+            <input class="form-check-input" type="radio" name="duration" id="oneTime" checked value="1">
+            <label class="form-check-label" for="oneTime">
+                &nbsp;&nbsp;One Time
+            </label>
+          </div>
+        <div class="form-check d-flex justify-content-center">
+            <input class="form-check-input" type="radio" name="duration" id="sixMonths" value="2">
+            <label class="form-check-label" for="sixMonths">
+                &nbsp;&nbsp;6 Months
+            </label>
+        </div>
+        <div class="form-check d-flex justify-content-center">
+            <input class="form-check-input" type="radio" name="duration" id="threeMonths" value="3">
+            <label class="form-check-label" for="threeMonths">
+                &nbsp;&nbsp;3 Months
+            </label>
+        </div>
+        <br>
+
+        <div class="mt-3 d-flex justify-content-center">
+            <input class="btn btn-primary" type="submit" value="Apply">
+        </div>
+    </div>
+</form>
+{% endblock content %}

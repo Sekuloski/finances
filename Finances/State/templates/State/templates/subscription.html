@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p style="text-align: center; font-size: 4rem"> Current Amount: {{ state }}</p>
+<form method="post" action="/subscribe"> {% csrf_token %}
+    <div class="form-group" style="margin: 0 auto;">
+
+        <label class="mb-3 d-flex justify-content-center" for="subscribe">Amount</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="number" name="subscribe" id="subscribe" style="width: 100px; text-align: left;" required/>
+        </div>
+        <br>
+
+        <label class="mb-3 d-flex justify-content-center" for="name">Name</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="text" name="name" id="name" style="width: 200px; text-align: left;" required/>
+        </div>
+        <br>
+
+        <div class="mt-3 d-flex justify-content-center">
+            <input class="btn btn-primary" type="submit" value="Subscribe">
+        </div>
+    </div>
+</form>
+{% endblock content %}
