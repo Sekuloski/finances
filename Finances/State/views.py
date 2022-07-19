@@ -47,8 +47,12 @@ def delete_view(request, id):
     payment = get_object_or_404(Payment, id = id)
     state = CurrentState.objects.get(id=1)
     if request.method =="POST":
-        if payment.fullPayment:
-            state.addFunds(-payment.amount, payment.bank)   
+        if payment.fullPayment and payment.date.month == datetime.datetime.now().month:
+            state.addFunds(-payment.amount, payment.bank)
+        elif payment.sixMonths and payment.date.month == datetime.datetime.now().month:
+            state.addFunds(-payment.amount/6, payment.bank)
+        elif payment.threeMonths and payment.date.month == datetime.datetime.now().month:
+            state.addFunds(-payment.amount/3, payment.bank)
         payment.delete()
         return redirect("/")
  
@@ -89,11 +93,11 @@ class MakePayment(TemplateView):
             payment = Payment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
             Pay(-amount, bank)
         elif duration == '2':
-            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False)
+            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False, sixMonths=True)
             Pay(-amount/6, bank)
             payment.monthsLeft -= 1
         else:
-            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False)
+            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False, threeMonths=True)
             Pay(-amount/3, bank)
             payment.monthsLeft -= 1
 
@@ -121,16 +125,16 @@ class MakeTestPayment(TemplateView):
         duration = request.POST['duration']
 
         if duration == '1':
-            payment = Payment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1))
+            payment = Payment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), testPayment=True)
             if request.POST['date'] == '':
                 Pay(-amount, bank)
         elif duration == '2':
-            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False)
+            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False, testPayment=True, sixMonths=True)
             if request.POST['date'] == '':
                 Pay(-amount/6, bank)
                 payment.monthsLeft -= 1
         else:
-            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False)
+            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False, testPayment=True, threeMonths=True)
             if request.POST['date'] == '':
                 Pay(-amount/3, bank)
                 payment.monthsLeft -= 1

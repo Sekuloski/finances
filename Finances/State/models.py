@@ -77,6 +77,9 @@ class Payment(models.Model):
     dayOfTheMonth = models.IntegerField(editable=False, default=1)
     updated = models.BooleanField(default=True)
     fullPayment = models.BooleanField(default=True)
+    testPayment = models.BooleanField(default=False)
+    sixMonths = models.BooleanField(default=False)
+    threeMonths = models.BooleanField(default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
