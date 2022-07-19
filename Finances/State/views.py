@@ -22,7 +22,7 @@ class Index(TemplateView):
             months = GetMonths(False)
               
         context = {
-            'state': CurrentState.objects.get(id=1).currentAmount,
+            'state': CurrentState.objects.get(id=1),
             'payments': Payment.objects.all(),
             'months': months
         }
@@ -62,15 +62,15 @@ class MakePayment(TemplateView):
         duration = request.POST['duration']
         if duration == '1':
             payment = Payment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
+            Pay(-amount, bank)
         elif duration == '2':
             payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
+            Pay(-amount/6, bank)
         else:
             payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
+            Pay(-amount/3, bank)
+
         payment.save()
-        if amount > 0:
-            Add(amount, bank)
-        else:
-            Pay(-amount, bank)
 
         return redirect('/')
 
@@ -140,17 +140,23 @@ def GetMonths(eur):
     sixMonthPayments = SixMonthPayment.objects.all()
     threeMonthPayments = ThreeMonthPayment.objects.all()
     state = CurrentState.objects.get(id=1)
+    lastMonth = state.currentAmount
+    salary = state.salary
+    subscriptions = state.totalSubscriptions
     for i in range(now, now+12):
         if i > 12:
-            months[calendar.month_name[i-12]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, state, eur)
+            months[calendar.month_name[i-12]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
+            lastMonth = months[calendar.month_name[i-12]]
         else:
-            months[calendar.month_name[i]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, state, eur)
+            months[calendar.month_name[i]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
+            lastMonth = months[calendar.month_name[i]]
+            
         counter += 1
     return months
 
 
-def calculateMonthSum(counter, six, three, state, eur):
-    finalSum = state.currentAmount + (counter + 1) * state.salary - (counter + 1) * state.totalSubscriptions
+def calculateMonthSum(counter, six, three, state, salary, subscriptions, eur):
+    finalSum = state +  salary - subscriptions
     negSum = 0
     for payment in six:
         if payment.monthsLeft - counter > 0:

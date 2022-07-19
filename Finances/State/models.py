@@ -1,4 +1,5 @@
 from django.db import models
+import math
 
 
 class CurrentState(models.Model):
@@ -32,8 +33,19 @@ class CurrentState(models.Model):
     def updateSubscriptions(self):
         self.totalSubscriptions = 0
         for payment in Subscription.objects.all():
-            self.totalSubscriptions += payment.amount
+            if payment.active:
+                self.totalSubscriptions -= payment.amount
         self.save()
+
+    def totalMonthlyPayments(self):
+        total = 0
+        for payment in SixMonthPayment.objects.all():
+            total += math.ceil(payment.amount/6)
+        
+        for payment in ThreeMonthPayment.objects.all():
+            total += math.ceil(payment.amount/3)
+
+        return total
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
