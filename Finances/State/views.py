@@ -1,7 +1,8 @@
 import datetime
 from sre_parse import State
-from django.shortcuts import render, redirect
-from django.views.generic import TemplateView, ListView
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView
 from.models import CurrentState, Payment, SixMonthPayment, ThreeMonthPayment, Subscription
 import calendar
 import math
@@ -29,11 +30,35 @@ class Index(TemplateView):
         return context
 
 
+class Payments(ListView):
+    template_name = 'payments.html'
+    model = Payment
+
+
+class UpdatePayment(UpdateView):
+    template_name = 'payment_form.html'
+    model = Payment
+    fields = ['name', 'amount', 'date']
+    success_url = reverse_lazy('Payments')
+
+
+def delete_view(request, id):
+    context ={}
+    payment = get_object_or_404(Payment, id = id)
+    state = CurrentState.objects.get(id=1)
+    if request.method =="POST":
+        if payment.fullPayment:
+            state.addFunds(-payment.amount, payment.bank)   
+        payment.delete()
+        return redirect("/")
+ 
+    return render(request, "payment_confirm_delete.html", context)
+
+
 class AddFunds(TemplateView):
     template_name = 'addFunds.html'
     
     def post(self, request, **kwargs):
-        print(request.POST)
         amount = int(request.POST['amount'])
         name = request.POST['name']
         bank = False
@@ -64,11 +89,13 @@ class MakePayment(TemplateView):
             payment = Payment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
             Pay(-amount, bank)
         elif duration == '2':
-            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
+            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False)
             Pay(-amount/6, bank)
+            payment.monthsLeft -= 1
         else:
-            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1))
+            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=datetime.datetime.now(), state=CurrentState.objects.get(id=1), fullPayment=False)
             Pay(-amount/3, bank)
+            payment.monthsLeft -= 1
 
         payment.save()
 
@@ -78,6 +105,42 @@ class MakePayment(TemplateView):
         context = {'state': CurrentState.objects.get(id=1).currentAmount}
         return context
 
+class MakeTestPayment(TemplateView):
+    template_name = 'test-payment.html'
+
+    def post(self, request, **kwargs):
+        if request.POST['date'] != '':
+            date = request.POST['date']
+        else:
+            date = datetime.datetime.now()
+        amount = -int(request.POST['payment'])
+        name = request.POST['name']
+        bank = False
+        if 'bank' in request.POST:
+            bank = True
+        duration = request.POST['duration']
+
+        if duration == '1':
+            payment = Payment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1))
+            if request.POST['date'] == '':
+                Pay(-amount, bank)
+        elif duration == '2':
+            payment = SixMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False)
+            if request.POST['date'] == '':
+                Pay(-amount/6, bank)
+                payment.monthsLeft -= 1
+        else:
+            payment = ThreeMonthPayment(amount=amount, name=name, bank=bank, date=date, state=CurrentState.objects.get(id=1), fullPayment=False)
+            if request.POST['date'] == '':
+                Pay(-amount/3, bank)
+                payment.monthsLeft -= 1
+
+        payment.save()
+        return redirect('/')
+
+    def get_context_data(self):
+        context = {'state': CurrentState.objects.get(id=1).currentAmount}
+        return context
 
 class History(ListView):
     template_name = 'history.html'
@@ -134,39 +197,82 @@ class Change(TemplateView):
 
 
 def GetMonths(eur):
-    counter = 0
     months = {}
     now = int(datetime.datetime.now().month) + 1
     sixMonthPayments = SixMonthPayment.objects.all()
     threeMonthPayments = ThreeMonthPayment.objects.all()
+    fullPayments = Payment.objects.all()
+    for payment in sixMonthPayments:
+        fullPayments = fullPayments.exclude(name=payment.name)
+    for payment in threeMonthPayments:
+        fullPayments = fullPayments.exclude(name=payment.name)
     state = CurrentState.objects.get(id=1)
     lastMonth = state.currentAmount
     salary = state.salary
     subscriptions = state.totalSubscriptions
     for i in range(now, now+12):
         if i > 12:
-            months[calendar.month_name[i-12]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
+            months[calendar.month_name[i-12]] = calculateMonthSum(i, fullPayments, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
             lastMonth = months[calendar.month_name[i-12]]
         else:
-            months[calendar.month_name[i]] = calculateMonthSum(counter, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
+            months[calendar.month_name[i]] = calculateMonthSum(i, fullPayments, sixMonthPayments, threeMonthPayments, lastMonth, salary, subscriptions, eur)
             lastMonth = months[calendar.month_name[i]]
             
-        counter += 1
     return months
 
 
-def calculateMonthSum(counter, six, three, state, salary, subscriptions, eur):
-    finalSum = state +  salary - subscriptions
+def calculateMonthSum(month, full, six, three, state, salary, subscriptions, eur):
+    now = datetime.datetime.now()
+    if eur and month > now.month + 1:
+        finalSum = state/0.016 + salary - subscriptions
+    else:
+        finalSum = state + salary - subscriptions
     negSum = 0
+    for payment in full:
+        if month > 12:
+            if payment.date.year > now.year: # 'NEXT YEAR ON PURCHASE, NEXT YEAR ON COUNTER'
+                if payment.date.month == (month - 12):
+                    negSum += math.ceil(payment.amount)
+        else:
+            if payment.date.year == now.year: # 'CURRENT YEAR ON PURCHASE, CURRENT ON COUNTER'
+                if payment.date.month == (month):
+                    negSum += math.ceil(payment.amount)
+                    """
+                    18-01-23 00:00 12   -> NO PAYMENT - DONE
+                    18-01-23 00:00 13   -> PAYMENT IF (13 - 12) - 1 in range(6)
+                    18-01-23 00:00 14   -> PAYMENT IF (13 - 12) - 1 in range(6)
+                    """
     for payment in six:
-        if payment.monthsLeft - counter > 0:
-            negSum += math.ceil(payment.amount / 6 )
+        if month <= 12:
+            if payment.date.year > now.year: # 01-23 -> 12
+                continue
+            if month - payment.date.month in range(6): # 09-22 -> 12
+                negSum += math.ceil(payment.amount / 6) 
+        else:
+            if payment.date.year == now.year: # 09-22 -> 13-12 = 1   12 - 9 = 3
+                if (12 - payment.date.month) + (month - 12) in range(6):
+                    negSum += math.ceil(payment.amount / 6)
+            elif payment.date.year > now.year: # 01-23 -> 13
+                if (month - 12) - payment.date.month in range(6):
+                    negSum += math.ceil(payment.amount / 6)
+
     for payment in three:
-        if payment.monthsLeft - counter > 0:
-            negSum += math.ceil(payment.amount / 3 )
+        if month <= 12:
+            if payment.date.year > now.year: 
+                continue
+            if month - payment.date.month in range(3): 
+                negSum += math.ceil(payment.amount / 3) 
+        else:
+            if payment.date.year == now.year: 
+                if (12 - payment.date.month) + (month - 12) in range(3):
+                    negSum += math.ceil(payment.amount / 3)
+            elif payment.date.year > now.year: 
+                if (month - 12) - payment.date.month in range(3):
+                    negSum += math.ceil(payment.amount / 3)
+    finalSum += negSum
     if eur:
-        return math.ceil((finalSum + negSum)*0.016)
-    return finalSum + negSum
+        return math.ceil(finalSum*0.016)
+    return finalSum
 
 
 def updatePayments():

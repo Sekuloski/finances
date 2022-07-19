@@ -40,10 +40,12 @@ class CurrentState(models.Model):
     def totalMonthlyPayments(self):
         total = 0
         for payment in SixMonthPayment.objects.all():
-            total += math.ceil(payment.amount/6)
+            if payment.monthsLeft in range(1,6):
+                total += math.ceil(payment.amount/6)
         
         for payment in ThreeMonthPayment.objects.all():
-            total += math.ceil(payment.amount/3)
+            if payment.monthsLeft in range(1,3):
+                total += math.ceil(payment.amount/3)
 
         return total
 
@@ -74,6 +76,7 @@ class Payment(models.Model):
     state = models.ForeignKey(CurrentState, on_delete=models.CASCADE)
     dayOfTheMonth = models.IntegerField(editable=False, default=1)
     updated = models.BooleanField(default=True)
+    fullPayment = models.BooleanField(default=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -86,7 +89,7 @@ class Payment(models.Model):
 
 
     def __str__(self):
-        return self.name + ' ' + str(self.amount) + ' ' + ('Bank ' if self.bank else 'Cash ') + str(self.date.strftime("%d-%m-%y %H:%M"))
+        return self.name + ' ' + str(self.amount) + ' ' + ('Bank ' if self.bank else 'Cash ') + str(self.date.strftime("%d-%m-%y %H:%M")) + ' ' + ('Full' if self.fullPayment else 'Monthly')
 
 
 class SixMonthPayment(Payment):

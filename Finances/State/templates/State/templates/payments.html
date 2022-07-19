@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for payment in object_list %}
+<div class="row">
+    <div class="col">
+        {{ payment }}
+    </div>
+    <div class="col">
+        <a class="btn btn-success mx-2" href="/payments/{{ payment.id }}">
+            Edit
+        </a>
+        <a class="btn btn-danger" href="/payments/delete/{{ payment.id }}">
+            Delete
+        </a>
+    </div>
+</div>
+<br>
+{% endfor %}
+{% endblock content %}
