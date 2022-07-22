@@ -36,7 +36,7 @@ class CurrentState(models.Model):
         self.totalSubscriptions = 0
         for payment in Subscription.objects.all():
             if payment.active:
-                self.totalSubscriptions -= payment.amount
+                self.totalSubscriptions += payment.amount
         self.save()
 
     def totalMonthlyPayments(self):
@@ -49,7 +49,7 @@ class CurrentState(models.Model):
             if payment.monthsLeft in range(1,3):
                 total += math.ceil(payment.amount/3)
 
-        return total
+        return -total
 
     def salaryNotReceived(self):
         return self.lastSalary.month != datetime.datetime.now().month

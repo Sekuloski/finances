@@ -36,10 +36,29 @@ class Payments(ListView):
 
 
 class UpdatePayment(UpdateView):
-    template_name = 'payment_form.html'
+    template_name = 'form.html'
     model = Payment
     fields = ['name', 'amount', 'date']
     success_url = reverse_lazy('Payments')
+
+
+class Subscriptions(ListView):
+    template_name = 'subscriptions.html'
+    model = Subscription
+
+
+class UpdateSubscription(UpdateView):
+    template_name = 'form.html'
+    model = Subscription
+    fields = ['name', 'amount', 'active']
+    success_url = reverse_lazy('Subscriptions')
+
+
+class DeleteSubscription(DeleteView):
+    model = Subscription
+    template_name = "subscription_confirm_delete.html"
+
+    success_url = reverse_lazy('Subscriptions')
 
 
 def delete_view(request, id):
@@ -54,7 +73,7 @@ def delete_view(request, id):
         elif payment.threeMonths and payment.date.month == datetime.datetime.now().month:
             state.addFunds(-payment.amount/3, payment.bank)
         payment.delete()
-        return redirect("/")
+        return redirect("/payments")
  
     return render(request, "payment_confirm_delete.html", context)
 
@@ -246,11 +265,7 @@ def calculateMonthSum(month, full, six, three, state, salary, subscriptions, eur
             if payment.date.year == now.year: # 'CURRENT YEAR ON PURCHASE, CURRENT ON COUNTER'
                 if payment.date.month == (month):
                     negSum += math.ceil(payment.amount)
-                    """
-                    18-01-23 00:00 12   -> NO PAYMENT - DONE
-                    18-01-23 00:00 13   -> PAYMENT IF (13 - 12) - 1 in range(6)
-                    18-01-23 00:00 14   -> PAYMENT IF (13 - 12) - 1 in range(6)
-                    """
+
     for payment in six:
         if month <= 12:
             if payment.date.year > now.year: # 01-23 -> 12

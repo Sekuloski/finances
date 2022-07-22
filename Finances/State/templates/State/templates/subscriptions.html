@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for subscription in object_list %}
+<div class="row">
+    <div class="col">
+        {{ subscription }}
+    </div>
+    <div class="col">
+        <a class="btn btn-success mx-2" href="/subscriptions/{{ subscription.id }}">
+            Edit
+        </a>
+        <a class="btn btn-danger" href="/subscriptions/delete/{{ subscription.id }}">
+            Delete
+        </a>
+    </div>
+</div>
+<br>
+{% endfor %}
+{% endblock content %}
