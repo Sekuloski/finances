@@ -18,9 +18,9 @@ class Index(TemplateView):
 
     def get_context_data(self):
         if 'eur' in self.request.GET:
-            months = GetMonths(True)    
+            months = GetMonths(eur=True)    
         else:
-            months = GetMonths(False)
+            months = GetMonths(eur=False)
               
         context = {
             'state': CurrentState.objects.get(id=1),
@@ -57,6 +57,11 @@ def delete_view(request, id):
         return redirect("/")
  
     return render(request, "payment_confirm_delete.html", context)
+
+
+def addSalary(request):
+    CurrentState.objects.get(id=1).addSalary()
+    return redirect('/')
 
 
 class AddFunds(TemplateView):

@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 import math
 
@@ -9,6 +10,7 @@ class CurrentState(models.Model):
     currentAmount = models.IntegerField(default=0, editable=False)
     salary = models.IntegerField(default=29500)
     totalSubscriptions = models.IntegerField(default=0)
+    lastSalary = models.DateField()
 
     def makePayment(self, amount, bank):
         if(bank):
@@ -48,6 +50,14 @@ class CurrentState(models.Model):
                 total += math.ceil(payment.amount/3)
 
         return total
+
+    def salaryNotReceived(self):
+        return self.lastSalary.month != datetime.datetime.now().month
+
+    def addSalary(self):
+        self.amountInBank += self.salary
+        self.lastSalary = datetime.datetime.now()
+        self.save()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

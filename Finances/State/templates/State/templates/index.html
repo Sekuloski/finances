@@ -9,13 +9,18 @@
     <a class="btn btn-danger m-2" style="font-size:2rem; width: 100px" type="submit" href="/pay">Pay</a>
 </div>
 <div class="row d-flex justify-content-center">
-    <a class="btn btn-primary m-2" style="font-size:2rem; width: 200px" type="submit" href="/subscribe">Subscribe</a>
-    <a class="btn btn-info m-2" style="font-size:2rem; width: 200px" type="submit" href="/change">Change</a>
+    <a class="col-1 btn btn-primary m-2" style="font-size:2rem; width: 200px" type="submit" href="/subscribe">Subscribe</a>
+    <a class="col-1 btn btn-info m-2" style="font-size:2rem; width: 200px" type="submit" href="/change">Change</a>
 </div>
 <div class="row d-flex justify-content-center">
     <a class="col-1 badge badge-dark text-decoration-none d-flex justify-content-center me-2" style="font-size:1.5rem" href="/">Mkd</a>
     <a class="col-1 badge badge-dark text-decoration-none d-flex justify-content-center ms-3" style="font-size:1.5rem;" href="/?eur">Euro</a>
 </div>
+{% if state.salaryNotReceived %}
+<div class="row d-flex justify-content-center">
+    <a class="col-3 btn btn-success m-2" style="font-size:2rem; width: 300px" type="submit" href="/addSalary">Salary Received</a>
+</div>
+{% endif %}
 <br>
 <br>
 <div class="row">
