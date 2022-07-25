@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for note in object_list %}
+<div class="row">
+    <div class="col">
+        {{ note }}
+    </div>
+    <div class="col">
+
+    </div>
+</div>
+<br>
+{% endfor %}
+{% endblock content %}
