@@ -21,5 +21,5 @@ from Notes import urls as noteUrls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(stateUrls)),
-    path('notes', include(noteUrls)),
+    path('notes/', include(noteUrls)),
 ]
