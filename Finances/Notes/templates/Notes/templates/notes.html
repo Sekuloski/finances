@@ -7,7 +7,12 @@
         {{ note }}
     </div>
     <div class="col">
-
+        <a class="btn btn-success mx-2" href="/notes/{{ note.id }}">
+            Edit
+        </a>
+        <a class="btn btn-danger" href="/notes/delete/{{ note.id }}">
+            Delete
+        </a>
     </div>
 </div>
 <br>

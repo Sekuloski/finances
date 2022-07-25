@@ -30,5 +30,18 @@
 <br>
 <hr>
 {% endfor %}
+<form method="post" action="/notes"> {% csrf_token %}
+    <div class="form-group" style="margin: 0 auto;">
+
+        <label class="mb-3 d-flex justify-content-center" for="text">Note</label>
+        <div class="d-flex justify-content-center">
+            <input class="input-group-text bg-dark text-white" type="text" name="text" id="text" style="width: 100px; text-align: left;" required/>
+        </div>
+        
+        <div class="mt-3 d-flex justify-content-center">
+            <input class="btn btn-primary" type="submit" value="Add Note">
+        </div>
+    </div>
+</form>
 </div>
 {% endblock content %}

@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from State import urls as stateUrls
+from Notes import urls as noteUrls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(stateUrls)),
+    path('notes', include(noteUrls)),
 ]

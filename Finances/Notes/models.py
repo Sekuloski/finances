@@ -1,8 +1,10 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Note(models.Model):
     text = models.TextField()
+    date = models.DateField(default=timezone.now())
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

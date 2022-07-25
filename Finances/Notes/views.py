@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, UpdateView, DeleteView
 
 from .models import Note
 
@@ -14,3 +15,17 @@ class NotesView(ListView):
         note.save()
 
         return redirect('/notes')
+
+
+class UpdateNote(UpdateView):
+    template_name = 'form.html'
+    model = Note
+    fields = ['text', 'date']
+    success_url = reverse_lazy('Notes')
+
+
+class DeleteNote(DeleteView):
+    model = Note
+    template_name = "note_confirm_delete.html"
+
+    success_url = reverse_lazy('Notes')
