@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, UpdateView, DeleteView
+from django.views.generic import ListView, UpdateView, DeleteView, TemplateView
 
-from .models import Note
+from ....models import Note
 
 # Create your views here.
 class NotesView(ListView):
@@ -29,3 +29,8 @@ class DeleteNote(DeleteView):
     template_name = "note_confirm_delete.html"
 
     success_url = reverse_lazy('Notes')
+
+
+class AddNote(TemplateView):
+    model = Note
+    template_name = 'addNote.html'

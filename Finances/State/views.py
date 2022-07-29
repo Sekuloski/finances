@@ -104,6 +104,10 @@ class AddFunds(TemplateView):
         context = {'state': CurrentState.objects.get(id=1).currentAmount}
         return context
 
+def addSalary(request):
+    CurrentState.objects.get(id=1).addSalary()
+    return redirect('/')
+
 
 class MakePayment(TemplateView):
     template_name = 'payment.html'
