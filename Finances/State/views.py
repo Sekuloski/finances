@@ -33,6 +33,8 @@ class Index(TemplateView):
 class Payments(ListView):
     template_name = 'payments.html'
     model = Payment
+    ordering = ['-date']
+
 
 
 class UpdatePayment(UpdateView):
