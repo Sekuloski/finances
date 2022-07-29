@@ -10,7 +10,7 @@ class NotesView(ListView):
     template_name = 'notes.html'
 
     def post(self, request, **kwargs):
-        text = request.POST['text']
+        text = request.POST['textArea']
         note = Note(text=text)
         note.save()
 
