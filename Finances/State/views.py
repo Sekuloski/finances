@@ -196,9 +196,9 @@ class History(ListView):
 
     def get_context_data(self, **kwargs):
         if 'query' in self.request.GET:
-            context = {'payments': Payment.objects.order_by('-date').filter(name__icontains=self.request.GET['query'])}
+            context = {'payments': Payment.objects.order_by('-date').filter(testPayment=False).filter(name__icontains=self.request.GET['query'])}
         else:
-            context = {'payments': Payment.objects.order_by('-date')}
+            context = {'payments': Payment.objects.order_by('-date').filter(testPayment=False)}
         return context
 
 
