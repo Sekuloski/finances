@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="row d-flex justify-content-center">
+    <a class="col-2 btn btn-info mx-2" href="/notes/addnote">
+        Add Note
+    </a>
+</div>
+<br>
 {% for note in object_list %}
 <div class="row">
     <div class="col">

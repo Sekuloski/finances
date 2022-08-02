@@ -34,7 +34,20 @@ class Payments(ListView):
     template_name = 'payments.html'
     model = Payment
     ordering = ['-date']
+    
+    def get_queryset(self, **kwargs):
+       qs = super().get_queryset(**kwargs)
+       return qs.filter(testPayment=False)
 
+
+class TestPayments(ListView):
+    template_name = 'payments.html'
+    model = Payment
+    ordering = ['-date']
+    
+    def get_queryset(self, **kwargs):
+       qs = super().get_queryset(**kwargs)
+       return qs.filter(testPayment=True)
 
 
 class UpdatePayment(UpdateView):
